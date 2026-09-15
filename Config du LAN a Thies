@@ -1,0 +1,11 @@
+Tout dabord connectons deux pc aux switchs ( mettre les ip statiques fournit par dans le file "architecture" )
+connecter le switch au routeur de Thies 
+entrer en CLI puis en mode de confuguration
+activer l'interface connecter au switch /
+-taper interface fa0/0 
+-taper ip address 192.168.30.1 255.255.255.0
+-taper no shutdown
+-taper exit
+
+LAN CREER !
+ 

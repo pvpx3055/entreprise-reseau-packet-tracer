@@ -1,0 +1,5 @@
+il faut que le switch puisse dire quel packet appartient a quel vlan , le mode trunk sert a cela , il etiquette chaque packet 
+recus et l'envoi au routeur , le routeur de son cotés sait quel pc de quel vlan a envoyer tel packets
+commandes au niveau du switch ( mode conf) :
+-taper interface ethernet 6/1
+-taper switchport mode trunk

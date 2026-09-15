@@ -1,0 +1,33 @@
+Le routage inter-VLAN permet à des appareils situés sur des VLAN différents de communiquer entre eux.
+
+Le problème : par défaut, un VLAN = un réseau isolé. Un PC du VLAN 10 ne peut pas parler à un PC du VLAN 20, même s'ils sont sur le même switch. C'est voulu (isolation, sécurité).
+
+La solution : il faut un équipement de niveau 3 (routeur ou switch L3) pour faire le lien entre les VLAN.
+
+Pour notre cas on utilisera le routeur de dakar . Notre objectifs est d'activer l'interface du routeur connecter au switch et dire au routeur 
+quel pc appartient a quel vlan car il n'en a aucune idée .
+Pour ce faire , on doit d'abord s'assurer que le routeur est bien connecter au switch (avec un cable copper sthraight thgrout)
+nous pouvais maintenant configurer le routeur avec les commandes suivants au niveau du cli :
+-taper enable
+-taper configure terminal
+-taper interface fa0/0 : pour entrer dans l'interface connecter au switch
+-taper no shutdown : afin d'actier en permanece cette interface
+-taper exit
+
+Nous avons allumer l'interface  , maintenant il faut dire au routeur que le reseaux est partager par deux vlan et que c'est lui qui devras les liée .
+Voici les commandes :
+-taper interface fa0/0.10 : pour specifier au routeur l'existence du vlan 10 et d'y entrer
+-taper encapsulation dot1q : permet d'ajouter une etiquette avec les numeros de vlan dans les packets 
+-taper ip address 192.168.10.1 255.255.255.0
+taper exit
+
+Et voila maintenant le routeur sait qu'il y'a un vlan 10 et est le gateway de ce dernier .
+Pour le second routeur voila comment cela se fera : 
+-taper interface fa0/0.20 : pour specifier au routeur l'existence du vlan 20 et d'y entrer
+-taper encapsulation dot1q : permet d'ajouter une etiquette avec les numeros de vlan dans les packets 
+-taper ip address 192.168.20.1 255.255.255.0
+taper exit
+
+>Et voila le routeur de DAKAR sait comment est constituer le reseaux , vous pouvez testez des simulations de pings pour voir le chemins des trames et packet.
+
+

@@ -1,0 +1,35 @@
+Le VLAN permet de segmenter logiquement un réseau physique en plusieurs réseaux distincts, pour améliorer la sécurité, la performance et l'organisation.
+Pour notre cas , a Dakar deux types de services travallaient sur le meme reseau local : l'it et l'administration . On veut deux pc dans chaque vlan.
+Pour ce faire on a connécte 4 pc aux switch PT-empty , on les connecte chaque ordinateur avec un cable copper straight throught au switch .
+Avec cette config , tout le monde parlait avec tout le monde > il faut creer une barriere logique .
+Pour config les vlan , il faut cliquer sur le switch , puis sur CLI :
+
+-cliquer sur le bouton ENTRER jusqu'a obtenir une ligne : switch>
+-taper la commande enable : utiliser pour entrer en mode privilieger
+-taper la commande configure terminal: pour pouvoir effectuer des changements au niveau du switch
+-taper la commande vlan 10 : elle creer un vlan au niveau du switch , le chiffre 10 a cotés est un id qui identifie de maniere unique un vlan 
+-taper la commande name IT : elle donne un nom un vlan
+-taper la commande exit : pour sortir du config-if
+
+A present que le vlan IT est creer , le premier reflexe est de verifier sa creation avec la commande "show vlan" (a faire en mode privilieger)
+Pour creer le second VLAN , on fera les meme etapes avec une petite differences bien specifiques :
+
+-taper la commande enable : utiliser pour entrer en mode privilieger
+-taper la commande configure terminal: pour pouvoir effectuer des changements au niveau du switch
+-taper la commande vlan 20 : elle creer un vlan au niveau du switch , le chiffre 20 a cotés est un id qui identifie de maniere unique un vlan 
+-taper la commande name ADMINISTRATION : elle donne un nom un vlan
+-taper la commande exit : pour sortir du config-if
+
+Et voila , les deux vlan sont creer maintenant il faut dire au switch quel pc appartient a quel vlan . Trois niveaux existe pour affecter des pc a un vlan , nous nous contenterons 
+du niveau trois pour ce cas . Au niveau 3 nous prendrons les numero de ports des entrées du switch et nous les affecterons chacun a un vlan.
+Exemple : Le pc0 est connécté au switch de cette facons : PC (port fast ethernet) ------------------ switch(fa1/0)
+Alors on prend l'entrée fa1/0 que l'on affectera a un vlan. Passons aux commandes :
+
+Au niveau du switch en mode configure terminal:
+-taper la commande interface fa1/0 : il faut dabord etre dans l'interface de l'entrée qu'on veut affecter a notre vlan
+-taper la commande switchport mode acces :
+-taper la commande switchport access vlan 10 : j'ai choisi d'affecter ce port au vlan 10
+-taper la commande exit : sortir du config-if
+
+Ainsi on fera les meme commandes pour les 4 pc mais on devra preciser a quel vlan ils seront affecter ! 
+

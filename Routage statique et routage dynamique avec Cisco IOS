@@ -1,0 +1,302 @@
+# Routage statique et routage dynamique avec Cisco IOS
+
+## 1. Introduction
+
+Le routage permet aux routeurs de choisir le chemin utilisé pour envoyer les paquets vers un réseau distant.
+
+Dans ce projet, deux méthodes sont utilisées :
+
+* **Routage statique :** les routes sont configurées manuellement par l’administrateur.
+* **Routage dynamique :** les routeurs échangent automatiquement leurs informations de routage grâce à un protocole comme RIP.
+
+---
+
+# 2. Routage statique
+
+## 2.1. Principe
+
+Avec le routage statique, on indique au routeur :
+
+1. Le réseau distant à atteindre.
+2. Le masque de ce réseau.
+3. Le prochain routeur ou l’interface de sortie.
+
+Le routeur ne découvre pas automatiquement les réseaux. L’administrateur doit ajouter les routes manuellement.
+
+## 2.2. Syntaxe générale
+
+```bash
+ip route réseau_destination masque prochain_saut
+```
+
+Exemple :
+
+```bash
+ip route 192.168.30.0 255.255.255.0 10.0.12.2
+```
+
+Explication :
+
+* `192.168.30.0` : réseau distant à atteindre.
+* `255.255.255.0` : masque du réseau distant.
+* `10.0.12.2` : adresse IP du routeur voisin qui connaît ce réseau.
+
+## 2.3. Configuration dans le projet
+
+### Sur R1 — routeur de Dakar
+
+```bash
+enable
+configure terminal
+
+ip route 192.168.30.0 255.255.255.0 10.0.12.2
+ip route 192.168.40.0 255.255.255.0 10.0.13.2
+
+end
+copy running-config startup-config
+```
+
+R1 apprend ainsi à atteindre :
+
+* Le réseau de Thiès : `192.168.30.0/24`
+* Le réseau de Saint-Louis : `192.168.40.0/24`
+
+### Sur R2 — routeur de Thiès
+
+```bash
+enable
+configure terminal
+
+ip route 192.168.10.0 255.255.255.0 10.0.12.1
+ip route 192.168.20.0 255.255.255.0 10.0.12.1
+ip route 192.168.40.0 255.255.255.0 10.0.12.1
+
+end
+copy running-config startup-config
+```
+
+### Sur R3 — routeur de Saint-Louis
+
+```bash
+enable
+configure terminal
+
+ip route 192.168.10.0 255.255.255.0 10.0.13.1
+ip route 192.168.20.0 255.255.255.0 10.0.13.1
+ip route 192.168.30.0 255.255.255.0 10.0.13.1
+
+end
+copy running-config startup-config
+```
+
+## 2.4. Vérification du routage statique
+
+Afficher la table de routage :
+
+```bash
+show ip route
+```
+
+Une route statique apparaît avec la lettre :
+
+```text
+S
+```
+
+Exemple :
+
+```text
+S    192.168.30.0/24 [1/0] via 10.0.12.2
+```
+
+Tester la communication :
+
+```bash
+ping 192.168.30.10
+```
+
+Supprimer une route statique :
+
+```bash
+no ip route 192.168.30.0 255.255.255.0 10.0.12.2
+```
+
+## 2.5. Avantages et limites
+
+### Avantages
+
+* Simple pour un petit réseau.
+* Contrôle précis du chemin.
+* Aucun échange automatique de routes.
+
+### Limites
+
+* Configuration manuelle longue.
+* Risque d’erreur humaine.
+* Les routes ne s’adaptent pas automatiquement à une panne.
+
+---
+
+# 3. Routage dynamique avec RIP version 2
+
+## 3.1. Principe
+
+Le routage dynamique permet aux routeurs de communiquer entre eux pour partager les réseaux qu’ils connaissent.
+
+Dans ce projet, le protocole utilisé est **RIP version 2**.
+
+RIP permet aux routeurs de découvrir automatiquement les réseaux distants et de mettre à jour leurs tables de routage.
+
+## 3.2. Commandes principales
+
+```bash
+router rip
+version 2
+network réseau_directement_connecté
+```
+
+Explication :
+
+* `router rip` : active le processus RIP.
+* `version 2` : utilise RIP version 2.
+* `network` : indique les réseaux directement connectés qui doivent être annoncés aux autres routeurs.
+
+## 3.3. Configuration sur R1 — Dakar
+
+```bash
+enable
+configure terminal
+
+router rip
+version 2
+
+network 192.168.10.0
+network 192.168.20.0
+network 10.0.12.0
+network 10.0.13.0
+
+end
+copy running-config startup-config
+```
+
+R1 annonce :
+
+* `192.168.10.0/24`
+* `192.168.20.0/24`
+* `10.0.12.0/30`
+* `10.0.13.0/30`
+
+## 3.4. Configuration sur R2 — Thiès
+
+```bash
+enable
+configure terminal
+
+router rip
+version 2
+
+network 192.168.30.0
+network 10.0.12.0
+
+end
+copy running-config startup-config
+```
+
+## 3.5. Configuration sur R3 — Saint-Louis
+
+```bash
+enable
+configure terminal
+
+router rip
+version 2
+
+network 192.168.40.0
+network 10.0.13.0
+
+end
+copy running-config startup-config
+```
+
+## 3.6. Vérification du routage dynamique
+
+Afficher les protocoles de routage actifs :
+
+```bash
+show ip protocols
+```
+
+Afficher la table de routage :
+
+```bash
+show ip route
+```
+
+Une route apprise grâce à RIP apparaît avec la lettre :
+
+```text
+R
+```
+
+Exemple :
+
+```text
+R    192.168.30.0/24 [120/1] via 10.0.12.2
+```
+
+Tester la communication :
+
+```bash
+ping 192.168.30.10
+ping 192.168.40.10
+```
+
+## 3.7. Désactiver RIP
+
+```bash
+enable
+configure terminal
+
+no router rip
+
+end
+```
+
+---
+
+# 4. Différence entre les deux méthodes
+
+| Élément                | Routage statique                    | Routage dynamique                         |
+| ---------------------- | ----------------------------------- | ----------------------------------------- |
+| Configuration          | Manuelle                            | Automatique après activation du protocole |
+| Découverte des réseaux | Non                                 | Oui                                       |
+| Adaptation aux pannes  | Non automatique                     | Possible selon le protocole               |
+| Maintenance            | Plus difficile dans un grand réseau | Plus adaptée aux grands réseaux           |
+| Commande principale    | `ip route`                          | `router rip`                              |
+| Marque dans la table   | `S`                                 | `R`                                       |
+
+## 5. Ordre recommandé pour le projet
+
+1. Configurer les adresses IP des interfaces.
+2. Vérifier les interfaces avec `show ip interface brief`.
+3. Tester les liaisons entre routeurs avec `ping`.
+4. Configurer les routes statiques.
+5. Vérifier avec `show ip route`.
+6. Tester les communications entre les sites.
+7. Supprimer ou désactiver le routage statique si nécessaire.
+8. Configurer RIP version 2.
+9. Vérifier avec `show ip protocols` et `show ip route`.
+10. Refaire les tests de communication.
+
+## 6. Commandes de diagnostic utiles
+
+```bash
+show ip interface brief
+show running-config
+show ip route
+show ip protocols
+ping adresse_ip
+traceroute adresse_ip
+```
+
+**Important :** les commandes `network` de RIP doivent correspondre aux réseaux directement connectés au routeur. Les routes statiques et RIP peuvent être utilisés séparément pour comparer les deux méthodes.

@@ -1,0 +1,12 @@
+Maintenant il faut connecter les differents routeurs . 
+Pour commencer celui de ST et de DAKAR 
+en mode de configuration du routeur de DAKAR :
+-taper interface gb1/1 : mettre l'interface qui est connécté au routeur de DAKAR
+-taper ip address 10.0.13.1 255.255.255.252
+-taper no shutdown
+taper exit
+Pour le coter DAKAR THIES 
+-taper interface gb1/2 : mettre l'interface qui est connécté au routeur de DAKAR
+-taper ip address 10.0.12.1 255.255.255.252
+-taper no shutdown
+taper exit
